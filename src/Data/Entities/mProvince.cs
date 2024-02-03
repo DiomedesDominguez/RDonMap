@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using NetTopologySuite.Geometries;
 
-namespace DNMOFT.CountryOnMap.Core.Data.Entities;
+namespace DNMOFT.CountryOnMap.Core.Data.Entities
 {
     public class mProvince
     {

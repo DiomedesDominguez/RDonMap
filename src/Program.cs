@@ -1,14 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration.Json;
-using src.Data.Context;
+﻿using System.Text.Json;
 using NetTopologySuite.Geometries;
+using DNMOFT.CountryOnMap.Core.Data.Entities;
 
 
 var factory = new DesignTimeDbContextFactory();
@@ -32,7 +24,7 @@ if (level0 != null && level0.features != null)
 {
     foreach (var country in level0.features)
     {
-        var countryEntity = new src.Data.Entities.mCountry
+        var countryEntity = new mCountry
         {
             Nombre = country.properties.COUNTRY,
             Codigo = country.properties.GID_0,
@@ -80,12 +72,12 @@ if (level1 != null && level1.features != null)
 {
     foreach (var province in level1.features)
     {
-        var provinceEntity = new src.Data.Entities.mProvince
+        var provinceEntity = new mProvince
         {
             Nombre = province.properties.NAME_1,
             Codigo = province.properties.GID_1,
             Tipo = province.properties.TYPE_1,
-            //Shape = province.geometry
+            CountryId = context.Countries.Where(c => c.Codigo == province.properties.GID_0).Select(x=>x.Id).FirstOrDefault()
         };
         var exists = context.Provinces.Any(p => p.Codigo == provinceEntity.Codigo);
         if (exists)
@@ -115,3 +107,48 @@ if (level1 != null && level1.features != null)
     context.SaveChanges();
 }
 
+// Get the stream of the file level 2
+fileStream = File.OpenRead(path_level2);
+
+//Deserialize the file
+var level2 = JsonSerializer.Deserialize<src.GADM.Level1.Root>(fileStream);
+fileStream.Close();
+fileStream.Dispose();
+if (level2 != null && level2.features != null)
+{
+    foreach (var province in level2.features)
+    {
+        var entity = new mMunicipality
+        {
+            Nombre = province.properties.NAME_1,
+            Codigo = province.properties.GID_1,
+            Tipo = province.properties.TYPE_1,
+            ProvinceId = context.Provinces.Where(c => c.Codigo == province.properties.GID_0).Select(x=>x.Id).FirstOrDefault()
+        };
+        var exists = context.Municipalities.Any(p => p.Codigo == entity.Codigo);
+        if (exists)
+            continue;
+
+        var poligonos = new List<Polygon>();
+
+        foreach (var coord in province.geometry.coordinates)
+        {
+            foreach (var ring in coord)
+            {
+                var coordenadas = new Coordinate[ring.Count];
+                var i = 0;
+                foreach (var point in ring)
+                {
+                    coordenadas[i++] = new Coordinate(point[0], point[1]);
+                }
+
+                poligonos.Add(new Polygon(new LinearRing(coordenadas)));
+            }
+        }
+
+        entity.Coordenadas = new MultiPolygon(poligonos.ToArray());
+
+        context.Municipalities.Add(entity);
+    }
+    context.SaveChanges();
+}

@@ -7,7 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using NetTopologySuite.Geometries;
 
-namespace DNMOFT.CountryOnMap.Core.Data.Entities;
+namespace DNMOFT.CountryOnMap.Core.Data.Entities
 {
     /// <summary>
     /// Clase que representa la entidad de país.
