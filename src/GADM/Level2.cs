@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace src.GADM
+namespace DNMOFT.CountryOnMap.Core.GADM
 {
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public class Level2
@@ -41,6 +41,7 @@ namespace src.GADM
         public string VARNAME_2 { get; set; }
         public string NL_NAME_2 { get; set; }
         public string TYPE_2 { get; set; }
+        public string TYPE_1 { get; set; }
         public string ENGTYPE_2 { get; set; }
         public string CC_2 { get; set; }
         public string HASC_2 { get; set; }

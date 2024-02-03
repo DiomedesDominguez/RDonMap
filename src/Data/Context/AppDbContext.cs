@@ -6,7 +6,7 @@ using DNMOFT.CountryOnMap.Core.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
-namespace src.Data.Context
+namespace DNMOFT.CountryOnMap.Core.Data.Context
 {
     public class AppDbContext: DbContext
     {
