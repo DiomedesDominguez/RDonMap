@@ -107,11 +107,11 @@ if (level1 != null && level1.features != null)
                 poligonos.Add(new Polygon(new LinearRing(coordenadas)));
             }
         }
-        
+
         provinceEntity.Coordenadas = new MultiPolygon(poligonos.ToArray());
 
         context.Provinces.Add(provinceEntity);
     }
     context.SaveChanges();
 }
-// Read
+
