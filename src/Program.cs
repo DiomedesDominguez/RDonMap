@@ -22,21 +22,21 @@ fileStream.Dispose();
 //If the deserialization is successful proceed to add the data to the database
 if (level0 != null && level0.features != null)
 {
-    foreach (var country in level0.features)
+    foreach (var feature in level0.features)
     {
-        var countryEntity = new mCountry
+        var entity = new mCountry
         {
-            Nombre = country.properties.COUNTRY,
-            Codigo = country.properties.GID_0,
+            Nombre = feature.properties.COUNTRY,
+            Codigo = feature.properties.GID_0,
         };
         //Check if the country already exists in the database
-        var exists = context.Countries.Any(c => c.Codigo == countryEntity.Codigo);
+        var exists = context.Countries.Any(c => c.Codigo == entity.Codigo);
         if (exists)
             continue;
 
         var poligonos = new List<Polygon>();
 
-        foreach (var coord in country.geometry.coordinates)
+        foreach (var coord in feature.geometry.coordinates)
         {
             foreach (var ring in coord)
             {
@@ -51,10 +51,8 @@ if (level0 != null && level0.features != null)
             }
         }
 
-        countryEntity.Coordenadas = new MultiPolygon(poligonos.ToArray());
-
-
-        context.Countries.Add(countryEntity);
+        entity.Coordenadas = new MultiPolygon(poligonos.ToArray());
+        context.Countries.Add(entity);
     }
     //Save the changes to the database
     context.SaveChanges();
@@ -70,22 +68,22 @@ fileStream.Close();
 fileStream.Dispose();
 if (level1 != null && level1.features != null)
 {
-    foreach (var province in level1.features)
+    foreach (var feature in level1.features)
     {
-        var provinceEntity = new mProvince
+        var entity = new mProvince
         {
-            Nombre = province.properties.NAME_1,
-            Codigo = province.properties.GID_1,
-            Tipo = province.properties.TYPE_1,
-            CountryId = context.Countries.Where(c => c.Codigo == province.properties.GID_0).Select(x=>x.Id).FirstOrDefault()
+            Nombre = feature.properties.NAME_1,
+            Codigo = feature.properties.GID_1,
+            Tipo = feature.properties.TYPE_1,
+            CountryId = context.Countries.Where(c => c.Codigo == feature.properties.GID_0).Select(x=>x.Id).FirstOrDefault()
         };
-        var exists = context.Provinces.Any(p => p.Codigo == provinceEntity.Codigo);
+        var exists = context.Provinces.Any(p => p.Codigo == entity.Codigo);
         if (exists)
             continue;
 
         var poligonos = new List<Polygon>();
 
-        foreach (var coord in province.geometry.coordinates)
+        foreach (var coord in feature.geometry.coordinates)
         {
             foreach (var ring in coord)
             {
@@ -100,9 +98,9 @@ if (level1 != null && level1.features != null)
             }
         }
 
-        provinceEntity.Coordenadas = new MultiPolygon(poligonos.ToArray());
+        entity.Coordenadas = new MultiPolygon(poligonos.ToArray());
 
-        context.Provinces.Add(provinceEntity);
+        context.Provinces.Add(entity);
     }
     context.SaveChanges();
 }
@@ -111,19 +109,19 @@ if (level1 != null && level1.features != null)
 fileStream = File.OpenRead(path_level2);
 
 //Deserialize the file
-var level2 = JsonSerializer.Deserialize<src.GADM.Level1.Root>(fileStream);
+var level2 = JsonSerializer.Deserialize<src.GADM.Level2.Root>(fileStream);
 fileStream.Close();
 fileStream.Dispose();
 if (level2 != null && level2.features != null)
 {
-    foreach (var province in level2.features)
+    foreach (var feature in level2.features)
     {
         var entity = new mMunicipality
         {
-            Nombre = province.properties.NAME_1,
-            Codigo = province.properties.GID_1,
-            Tipo = province.properties.TYPE_1,
-            ProvinceId = context.Provinces.Where(c => c.Codigo == province.properties.GID_0).Select(x=>x.Id).FirstOrDefault()
+            Nombre = feature.properties.NAME_1,
+            Codigo = feature.properties.GID_2,
+            Tipo = feature.properties.TYPE_2,
+            ProvinceId = context.Provinces.Where(c => c.Codigo == feature.properties.GID_1).Select(x=>x.Id).FirstOrDefault()
         };
         var exists = context.Municipalities.Any(p => p.Codigo == entity.Codigo);
         if (exists)
@@ -131,7 +129,7 @@ if (level2 != null && level2.features != null)
 
         var poligonos = new List<Polygon>();
 
-        foreach (var coord in province.geometry.coordinates)
+        foreach (var coord in feature.geometry.coordinates)
         {
             foreach (var ring in coord)
             {
