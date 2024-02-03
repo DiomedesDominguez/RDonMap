@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
+using Npgsql;
 using src.Data.Context;
 using System.IO;
 
@@ -12,12 +13,15 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<AppDbConte
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("connectionstrings.json")
             .Build();
-
         var builder = new DbContextOptionsBuilder<AppDbContext>();
 
         var connectionString = configuration.GetConnectionString("DefaultConnection");
 
-        builder.UseNpgsql(connectionString);
+        var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
+        dataSourceBuilder.UseNetTopologySuite();
+        var dataSource = dataSourceBuilder.Build();
+
+        builder.UseNpgsql(dataSource, b => b.UseNetTopologySuite());
 
         return new AppDbContext(builder.Options);
     }

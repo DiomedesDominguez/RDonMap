@@ -11,6 +11,7 @@ namespace src.Data.Context
     public class AppDbContext: DbContext
     {
         public DbSet<mCountry> Countries { get; set; }
+        public DbSet<mProvince> Provinces { get; set; }
         public AppDbContext(DbContextOptions options) : base(options)
         {
             
