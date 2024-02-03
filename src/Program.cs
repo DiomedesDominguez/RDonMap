@@ -37,7 +37,11 @@ if (level0 != null && level0.features != null)
             Nombre = country.properties.COUNTRY,
             Codigo = country.properties.GID_0,
         };
-        
+        //Check if the country already exists in the database
+        var exists = context.Countries.Any(c => c.Codigo == countryEntity.Codigo);
+        if (exists)
+            continue;
+            
         var poligonos = new List<Polygon>();
 
         foreach (var coord in country.geometry.coordinates)
@@ -49,18 +53,16 @@ if (level0 != null && level0.features != null)
                 foreach (var point in ring)
                 {
                     coordenadas[i++] = new Coordinate(point[0], point[1]);
-                }                
-                
+                }
+
                 poligonos.Add(new Polygon(new LinearRing(coordenadas)));
             }
         }
 
         countryEntity.Coordenadas = new MultiPolygon(poligonos.ToArray());
-        
-        //Check if the country already exists in the database
-        var exists = context.Countries.Any(c => c.Codigo == countryEntity.Codigo);
-        if (!exists)
-            context.Countries.Add(countryEntity);
+
+
+        context.Countries.Add(countryEntity);
     }
     //Save the changes to the database
     context.SaveChanges();
