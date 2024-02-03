@@ -118,7 +118,7 @@ if (level2 != null && level2.features != null)
     {
         var entity = new mMunicipality
         {
-            Nombre = feature.properties.NAME_1,
+            Nombre = feature.properties.NAME_2,
             Codigo = feature.properties.GID_2,
             Tipo = feature.properties.TYPE_2,
             ProvinceId = context.Provinces.Where(c => c.Codigo == feature.properties.GID_1).Select(x=>x.Id).FirstOrDefault()
