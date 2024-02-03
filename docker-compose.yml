@@ -1,0 +1,27 @@
+version: "3.8"
+services:
+  dbGadm:
+    restart: always
+    image: "postgis/postgis:16-3.4-alpine"
+    container_name: dbGadm
+    env_file: "DB Server/postgredb.env"
+    ports: 
+      - 36100:5432 # Remove when the web service it's ready
+    volumes:
+      - postgre_data:/var/lib/postgresql/data
+  # This is just to have DB Admin access to the database this can be removed later on the project
+  dbManager:
+    restart: always
+    image: dpage/pgadmin4
+    container_name: dbManager
+    env_file: "DB Server/postgredb_admin.env"
+    ports: 
+      - 36110:80
+    volumes:
+      - manager:/pgadmin4
+      - lybraries:/var/lib/pgadmin
+volumes:
+  myapp:
+  postgre_data:
+  manager:
+  lybraries:
