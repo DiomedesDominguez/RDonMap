@@ -80,7 +80,7 @@ public class MapHelper
                             Nombre = feature.properties.NAME_2,
                             Codigo = feature.properties.GID_2,
                             Tipo = feature.properties.TYPE_2,
-                            ProvinceId = dbContext.Countries.Where(c => c.Codigo == feature.properties.GID_1).Select(x => x.Id).FirstOrDefault()
+                            ProvinceId = dbContext.Provinces.Where(c => c.Codigo == feature.properties.GID_1).Select(x => x.Id).FirstOrDefault()
                         };
                         exists = dbContext.Provinces.Any(p => p.Codigo == feature.properties.GID_2);
                         break;
@@ -90,6 +90,19 @@ public class MapHelper
                     continue;
 
                 SetMultiPolygon(feature, entity);
+
+                switch (entityType)
+                {
+                    case EntityType.Country:
+                        dbContext.Countries.Add(entity);
+                        break;
+                    case EntityType.Province:
+                        dbContext.Provinces.Add(entity);
+                        break;
+                    case EntityType.Municipality:
+                        dbContext.Municipalities.Add(entity);
+                        break;
+                }
             }
         }
 

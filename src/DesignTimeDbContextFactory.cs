@@ -1,8 +1,8 @@
+using DNMOFT.CountryOnMap.Core.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
-using src.Data.Context;
 using System.IO;
 
 public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
