@@ -17,7 +17,7 @@ var context = factory.CreateDbContext([]);
 
 const string path_level0 = "../GADM/gadm41_DOM_0.json";
 const string path_level1 = "../GADM/gadm41_DOM_1.json";
-// const string path_level2 = "../GADM/gadm41_DOM_2.json";
+const string path_level2 = "../GADM/gadm41_DOM_2.json";
 
 //Get the stream of the file
 var fileStream = File.OpenRead(path_level0);
@@ -41,7 +41,7 @@ if (level0 != null && level0.features != null)
         var exists = context.Countries.Any(c => c.Codigo == countryEntity.Codigo);
         if (exists)
             continue;
-            
+
         var poligonos = new List<Polygon>();
 
         foreach (var coord in country.geometry.coordinates)
@@ -84,11 +84,33 @@ if (level1 != null && level1.features != null)
         {
             Nombre = province.properties.NAME_1,
             Codigo = province.properties.GID_1,
+            Tipo = province.properties.TYPE_1,
             //Shape = province.geometry
         };
         var exists = context.Provinces.Any(p => p.Codigo == provinceEntity.Codigo);
-        if (!exists)
-            context.Provinces.Add(provinceEntity);
+        if (exists)
+            continue;
+
+        var poligonos = new List<Polygon>();
+
+        foreach (var coord in province.geometry.coordinates)
+        {
+            foreach (var ring in coord)
+            {
+                var coordenadas = new Coordinate[ring.Count];
+                var i = 0;
+                foreach (var point in ring)
+                {
+                    coordenadas[i++] = new Coordinate(point[0], point[1]);
+                }
+
+                poligonos.Add(new Polygon(new LinearRing(coordenadas)));
+            }
+        }
+        
+        provinceEntity.Coordenadas = new MultiPolygon(poligonos.ToArray());
+
+        context.Provinces.Add(provinceEntity);
     }
     context.SaveChanges();
 }
